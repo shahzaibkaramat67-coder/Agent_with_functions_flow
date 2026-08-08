@@ -1,12 +1,14 @@
 # function_tool/evaluation.py
 
-from Agentic_Agent.model import llm
+from Agentic_Agent.model import ensure_llm
 import json
 
 
 def evaluation(update_query, tool_result):
 
     print("=" * 10, "Evaluation", "=" * 10)
+
+    llm = ensure_llm()
 
     prompt = f"""
 You are an Evaluation Agent.

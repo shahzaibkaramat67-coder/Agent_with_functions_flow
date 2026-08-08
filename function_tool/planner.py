@@ -1,12 +1,14 @@
 # function_tool/planner.py
 
-from Agentic_Agent.model import llm
+from Agentic_Agent.model import ensure_llm
 import json
 
 
 def Planner(user_query, tool_result, evaluation_reason):
 
     print("=" * 10, "Planner", "=" * 10)
+
+    llm = ensure_llm()
 
     prompt = f"""
 You are a Planning Agent.

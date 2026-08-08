@@ -1,17 +1,30 @@
 from langchain_google_genai import GoogleGenerativeAI
-
-# from langchain.agents import create_agent
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
 
-# from langchain_ollama import ChatOllama
+def get_llm():
+    api_key = os.getenv("GEMINI_NEW_API_KEY")
+    # print("GEMINI_API_KEY exists:", bool(os.getenv("GEMINI_API_KEY")))
+    # print("GOOGLE_API_KEY exists:", bool(os.getenv("GOOGLE_API_KEY")))
 
-# llm = ChatOllama(model="qwen3:4b", temperature=0)
+    if not api_key:
+        return None
+
+    return GoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        google_api_key=api_key,
+    )
 
 
-llm = GoogleGenerativeAI(
-    model="gemini-2.5-flash-lite", google_api_key=os.getenv("GEMINI_API_KEY")
-)
+llm = get_llm()
+
+
+def ensure_llm():
+    if llm is None:
+        raise ValueError(
+            "GEMINI_API_KEY is not configured. Add it in the Streamlit sidebar or .env file."
+        )
+    return llm

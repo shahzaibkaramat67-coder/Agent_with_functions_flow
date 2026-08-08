@@ -1,11 +1,13 @@
 # function_tool/updateQuery.py
 
-from Agentic_Agent.model import llm
+from Agentic_Agent.model import ensure_llm
 
 
 def updateQuery(user_input):
 
     print("=" * 10, "Update Query", "=" * 10)
+
+    llm = ensure_llm()
 
     prompt = f"""
 You are a professional query rewriting agent.

@@ -1,7 +1,9 @@
-from Agentic_Agent.model import llm
+from Agentic_Agent.model import ensure_llm
 
 
 def Rag_response(template):
+    llm = ensure_llm()
+
     system_prompt = f"""
     
     you are professioanl agent 

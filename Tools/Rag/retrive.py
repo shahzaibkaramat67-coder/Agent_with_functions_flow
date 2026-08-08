@@ -6,38 +6,40 @@ import os
 
 
 def retriver_ChromaDB(query):
+    try:
+        model = os.getenv(
+            "EMBADDING_MODEL_SENTENCE", "sentence-transformers/all-MiniLM-L6-v2"
+        )
+        embedding_model = HuggingFaceEmbeddings(model=model)
 
-    model = os.getenv("EMBADDING_MODEL_SENTENCE")
-    Embedding_model = HuggingFaceEmbeddings(model=model)
+        persist_directory = os.path.join("data", "chroma_db")
+        vectorStore = Chroma(
+            embedding_function=embedding_model,
+            persist_directory=persist_directory,
+        )
 
-    vectorStore = Chroma(
-        embedding_function=Embedding_model,
-        persist_directory="Agent/Agentic_Agent/ChromaDB",
-    )
+        retriever = vectorStore.as_retriever(
+            search_type="mmr",
+            search_kwargs={"k": 3, "fetch_k": 5, "lambda_mult": 0.7},
+        )
 
-    retriver = vectorStore.as_retriever(
-        search_type="mmr", search_kwargs={"k": 3, "fetch_k": 5, "lambda_mult": 0.7}
-    )
+        template = ChatPromptTemplate.from_template(
+            [
+                (
+                    "system",
+                    """ 
+                    You are a helpful AI assistant. Use only the provided context to answer the question.
+                    If the answer is not present in the context, say 'I could not find the answer in the document.'
+                    """,
+                ),
+                ("human", "user Question: {query}\n\nContext:\n{content}"),
+            ]
+        )
 
-    templetae = ChatPromptTemplate.from_template(
-        [
-            (
-                "system",
-                """ 
-              you are a helpfull Ai Assistant use only the
-               provided the context to answer the question 
-               if the answer is not presnt in the context 
-               say 'i could not find the answer in the document'
-            """,
-            ),
-            ("human", "user Question {query} content {content}"),
-        ]
-    )
+        relevant_docs = retriever.invoke(query)
+        content = "\n\n".join(doc.page_content for doc in relevant_docs)
 
-    retrive_query = retriver.invoke(query)
-
-    content = " ".json(doc.page_content for doc in retrive_query)
-
-    template = templetae.invoke({"query": query, "content": content})
-    response = Rag_response(template)
-    return response
+        prompt = template.invoke({"query": query, "content": content})
+        return Rag_response(prompt)
+    except Exception as exc:
+        return f"RAG Error: {str(exc)}"

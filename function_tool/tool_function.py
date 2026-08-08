@@ -1,12 +1,14 @@
 # function_tool/tool_function.py
 
-from Agentic_Agent.model import llm
+from Agentic_Agent.model import ensure_llm
 import json
 
 
 def Tool_function(query):
 
     print("=" * 10, "Tool Selector", "=" * 10)
+
+    llm = ensure_llm()
 
     prompt = f"""
 You are a Tool Selection Agent.
