@@ -15,7 +15,8 @@ os.environ["USER_AGENT"] = "my-streamlit-app"
 
 def ensure_api_keys():
     if st.session_state.get("gemini_api_key"):
-        os.environ["GEMINI_API_KEY"] = st.session_state.gemini_api_key
+        key = st.session_state.gemini_api_key.strip()
+        os.environ["GEMINI_NEW_API_KEY"] = key
     if st.session_state.get("tavily_api_key"):
         os.environ["TAVILY_API_KEY"] = st.session_state.tavily_api_key
     if st.session_state.get("embedding_model"):
@@ -49,7 +50,7 @@ def main():
     st.sidebar.title("⚙️ Configuration")
     st.session_state.gemini_api_key = st.sidebar.text_input(
         "Gemini API Key",
-        value=os.getenv("GEMINI_API_KEY", ""),
+        value=os.getenv("GEMINI_NEW_API_KEY", ""),
         type="password",
     )
     st.session_state.tavily_api_key = st.sidebar.text_input(

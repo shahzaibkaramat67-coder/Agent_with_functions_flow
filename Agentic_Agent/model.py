@@ -5,26 +5,39 @@ import os
 load_dotenv()
 
 
-def get_llm():
-    api_key = os.getenv("GEMINI_NEW_API_KEY")
-    # print("GEMINI_API_KEY exists:", bool(os.getenv("GEMINI_API_KEY")))
-    # print("GOOGLE_API_KEY exists:", bool(os.getenv("GOOGLE_API_KEY")))
+def resolve_google_key():
+    return os.getenv("GEMINI_NEW_API_KEY")
 
+
+def resolve_model_name():
+    return (
+        os.getenv("GEMINI_API_MODEL")
+        or os.getenv("GEMINI_API_MODEL_LITE")
+        or "gemini-2.5-flash"
+    )
+
+
+def get_llm():
+    api_key = resolve_google_key()
     if not api_key:
         return None
 
     return GoogleGenerativeAI(
-        model="gemini-2.5-flash",
+        model=resolve_model_name(),
         google_api_key=api_key,
     )
 
 
-llm = get_llm()
+llm = None
 
 
 def ensure_llm():
-    if llm is None:
+    global llm
+    api_key = resolve_google_key()
+    if not api_key:
         raise ValueError(
-            "GEMINI_API_KEY is not configured. Add it in the Streamlit sidebar or .env file."
+            "No valid Google Gemini API key found. Add GEMINI_NEW_API_KEY in the sidebar or .env file."
         )
+
+    llm = get_llm()
     return llm
